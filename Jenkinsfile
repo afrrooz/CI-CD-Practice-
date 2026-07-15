@@ -1,36 +1,36 @@
 pipeline {
-  agent any
+    agent any
 
-  options {
-    timestamps()
-    disableConcurrentBuilds()
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    options {
+        timestamps()
+        disableConcurrentBuilds()
     }
 
-    stage('Set Up') {
-      steps {
-        bat 'python -m pip install --upgrade pip'
-        bat 'python -m pip install -r requirements.txt'
-      }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Set Up') {
+            steps {
+                sh 'python3 -m pip install --upgrade pip'
+                sh 'python3 -m pip install -r requirements.txt'
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                sh 'python3 -m py_compile app.py'
+                sh 'python3 -c "from app import app; print(app.url_map)"'
+            }
+        }
     }
 
-    stage('Verify') {
-      steps {
-        bat 'python -m py_compile app.py'
-        bat 'python -c "from app import app; print(app.url_map)"'
-      }
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
     }
-  }
-
-  post {
-    always {
-      echo 'Pipeline finished.'
-    }
-  }
 }
